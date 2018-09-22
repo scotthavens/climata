@@ -83,10 +83,13 @@ class StationIO(SnotelIO):
     county = FilterOpt(url_param='countyNames', multi=True)
     basin = FilterOpt(url_param='hucs', multi=True)
     parameter = FilterOpt(url_param='elementCds', multi=True)
+    network = FilterOpt(url_param='networkCds', multi=True)
 
     # Additional options
     min_latitude = FilterOpt(url_param='minLatitude')
     max_latitude = FilterOpt(url_param='maxLatitude')
+    min_longitude = FilterOpt(url_param='minLongitude')
+    max_longitude = FilterOpt(url_param='maxLongitude')
     min_elevation = FilterOpt(url_param='minElevation')
     max_elevation = FilterOpt(url_param='maxElevation')
     ordinals = FilterOpt(url_param='ordinals')
