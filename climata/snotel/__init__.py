@@ -53,6 +53,25 @@ class SnotelIO(WebserviceLoader, BaseParser, TupleMapper, BaseIO):
             else:
                 parse = str
             self.data = [parse(row) for row in self.data]
+            
+    def serialize_params(self, params, complex_type):
+        """
+        The AWDB NRCS webservice allows for multiple parameters, need
+        to have the ability to query multiple stations at a time for
+        effeciency. If one of the parameters is a list, the client will
+        be able to make multiple types for the list.
+        
+        Therefore, overwrite the `serialize_params` to not join vals if
+        it's a list
+        """
+
+        if complex_type:
+            raise NotImplementedError("Cannot serialize %s!" % params)
+        else:
+            return {
+                self.get_url_param(key): val
+                for key, val in params.items()
+            }
 
     # Some records may have additional fields; loop through entire
     # array to ensure all field names are accounted for.  (Otherwise BaseIO
