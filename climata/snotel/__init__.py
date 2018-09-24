@@ -7,7 +7,7 @@ from wq.io.util import flattened
 
 from suds.client import Client
 from suds.sudsobject import asdict, Object as SudsObject
-from climata.base import WebserviceLoader, FilterOpt, DateOpt
+from climata.base import WebserviceLoader, FilterOpt, DateOpt, DateTimeOpt
 from climata.base import fill_date_range, as_list
 
 url = 'https://wcc.sc.egov.usda.gov/awdbWebService/services?WSDL'
@@ -381,7 +381,7 @@ class HourlyDataIO(TimeSeriesMapper, SnotelIO):
     ]
 
     # Applicable WebserviceLoader default options
-    station = FilterOpt(required=True, url_param='stationTriplets')
+    station = FilterOpt(required=True, url_param='stationTriplets', multi=True)
     parameter = FilterOpt(required=True, url_param='elementCd')
     start_date = DateOpt(required=True, url_param='beginDate')
     end_date = DateOpt(required=True, url_param='endDate')
@@ -398,14 +398,27 @@ class HourlyDataIO(TimeSeriesMapper, SnotelIO):
 
     def load(self):
         super(HourlyDataIO, self).load()
-        if self.data and 'values' in self.data[0]:
-            self.data = [
-                asdict(row)
-                for row in as_list(self.data[0]['values'])
-            ]
-        else:
-            raise NoData
+        d = {} # since mutiple triplets can be used, then go through each station
+        for data in self.data:
+            stationTriplet = data['stationTriplet']
+            if data and 'values' in data:
+                data = [
+                    asdict(row)
+                    for row in as_list(data['values'])
+                ]
+            else:
+                data = []
+            d[stationTriplet] = data
+        self.data = d
 
+class StationHourlyDataElementIO(HourlyDataIO):
+    """
+    Requests hourly data for the specified stations, just request the
+    data without asking for the elements.
+
+    """
+    inner_io_class = HourlyDataIO
+    duration = "HOURLY"
 
 class StationHourlyDataIO(StationDataIO):
     """

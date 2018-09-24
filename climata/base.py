@@ -5,6 +5,7 @@ from wq.io import make_date_mapper, NetLoader, Zipper
 
 
 parse_date = make_date_mapper('%Y-%m-%d')
+parse_datetime = make_date_mapper('%Y-%m-%d %H:%M:%S')
 
 
 class FilterOpt(object):
@@ -48,6 +49,24 @@ class FilterOpt(object):
                 return [value]
         return value
 
+class DateTimeOpt(FilterOpt):
+    date_only = True
+
+    def parse_datetime(self, value):
+        return parse_datetime(value)
+
+    def parse(self, value):
+        """
+        Parse date
+        """
+        value = super(DateTimeOpt, self).parse(value)
+        if value is None:
+            return None
+        if isinstance(value, str):
+            value = self.parse_datetime(value)
+        if isinstance(value, datetime) and self.date_only:
+            value = value.date()
+        return value
 
 class DateOpt(FilterOpt):
     date_only = True
@@ -64,8 +83,8 @@ class DateOpt(FilterOpt):
             return None
         if isinstance(value, str):
             value = self.parse_date(value)
-        if isinstance(value, datetime) and self.date_only:
-            value = value.date()
+        if isinstance(value, datetime):
+            value = value.strftime("%Y-%m-%d %H:%M:%S")
         return value
 
 
