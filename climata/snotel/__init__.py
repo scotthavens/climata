@@ -127,11 +127,19 @@ class StationIO(SnotelIO):
 
     def load(self):
         super(StationIO, self).load()
-        self.data = [
-            StationMetaIO(station=station, debug=self.debug).data[0]
-            for station in self.data
-        ]
+        if len(self.data) > 0:
+            self.data = StationMetaMultipleIO(stations=self.data, debug=self.debug).data
 
+
+class StationMetaMultipleIO(SnotelIO):
+    """
+    Wrapper for getStationMetadataMultiple() - used internally by StationIO.
+    """
+
+    data_function = 'getStationMetadataMultiple'
+
+    stations = FilterOpt(required=True, url_param='stationTriplets', multi=True)
+    
 
 class StationMetaIO(SnotelIO):
     """
