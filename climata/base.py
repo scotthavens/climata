@@ -242,13 +242,7 @@ class WebserviceLoader(NetLoader):
         """
         if complex:
             # See climata.acis for an example implementation
-#             raise NotImplementedError("Cannot serialize %s!" % params)
-            nparams = {}
-            for key, val in list(params.items()):
-                url_param = self.get_url_param(key)
-                if len(val) == 1 and isinstance(val[0], str):
-                    val = val[0]
-                nparams[url_param] = val
+            raise NotImplementedError("Cannot serialize %s!" % params)
         else:
             # Simpler queries can use traditional URL parameters
             return {
